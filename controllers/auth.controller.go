@@ -8,7 +8,18 @@ import (
 )
 
 func CreateUser(c *gin.Context) {
-	token, err := handlers.CreateUser(c)
+	token, err := handlers.Register(c)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{ "message": err.Error() })
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H { "message": token })
+}
+
+func GetUser(c *gin.Context) {
+	token, err := handlers.Login(c)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{ "message": err.Error() })

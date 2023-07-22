@@ -11,6 +11,7 @@ func CreateRoutes() *gin.Engine {
 
 	auth := r.Group("/user")
 	auth.POST("/register", controllers.CreateUser)
+	auth.POST("/login", controllers.GetUser)
 
 	return r
 }

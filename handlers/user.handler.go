@@ -15,7 +15,9 @@ type UserInput struct {
 	ConfirmPassword string `json:"confirm_password"`
 }
 
-func CreateUser(c *gin.Context) (string, error) {
+var secretKey = lib.GetEnv("SECRET_KEY")
+
+func Register(c *gin.Context) (string, error) {
 	var UserInput UserInput
 
 	if err := c.ShouldBind(&UserInput); err != nil {
@@ -27,7 +29,7 @@ func CreateUser(c *gin.Context) (string, error) {
 		return "", errMsg
 	}
 
-	encryptedPass, err := lib.EncryptPass(UserInput.Password)
+	encryptedPass, err := lib.EncryptPass(UserInput.Password, secretKey)
 
 	if UserInput.Password != UserInput.ConfirmPassword {
 		errMsg := errors.New(err.Error())
@@ -42,4 +44,15 @@ func CreateUser(c *gin.Context) (string, error) {
 	fmt.Println(NewUser)
 
 	return "", nil
+}
+
+func Login(c *gin.Context) (string, error) {
+	var userInput UserInput
+
+	if err := c.ShouldBind(&userInput); err != nil {
+		return "", err
+	}
+	textPass, _ := lib.Decrypt(userInput.Password, secretKey)
+
+	return textPass, nil
 }
