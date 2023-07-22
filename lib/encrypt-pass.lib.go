@@ -4,12 +4,9 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/base64"
-	"os"
-
-	"github.com/joho/godotenv"
 )
-var _ = godotenv.Load(".env")
-var secretKey = os.Getenv("SECRET_KEY")
+
+var secretKey = GetEnv("SECRET_KEY")
 
 func encode(b []byte) string {
 	return base64.StdEncoding.EncodeToString(b)
