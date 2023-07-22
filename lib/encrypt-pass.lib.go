@@ -6,14 +6,12 @@ import (
 	"encoding/base64"
 )
 
-var secretKey = GetEnv("SECRET_KEY")
-
 func encode(b []byte) string {
 	return base64.StdEncoding.EncodeToString(b)
 }
 
-func EncryptPass(password string) (string, error) {
-	block, err := aes.NewCipher([]byte(secretKey))
+func EncryptPass(password string, sk string) (string, error) {
+	block, err := aes.NewCipher([]byte(sk))
 
 	if err != nil {
 		return "", err

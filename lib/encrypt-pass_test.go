@@ -6,7 +6,7 @@ import (
 )
 
 func TestEncryptPass(t *testing.T) {
-	encryptedPass, _ := EncryptPass("Hello, this is a secret message!")
+	encryptedPass, _ := EncryptPass("Hello, this is a secret message!", "tewsesdkfjksldjfklsdjfl;k")
 	if encryptedPass == "" {
 		t.Fatal("Function return empty string")
 	}
