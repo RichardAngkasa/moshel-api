@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
 	"moshel-api/lib"
 	"moshel-api/models"
 
@@ -47,6 +48,7 @@ func Register(c *gin.Context) (string, error) {
 	_, err = stmt.Exec(UserInput.Username, encryptedPass)
 
 	if err != nil {
+		log.Println(err.Error())
 		return "", errors.New("Cannot insert data to db")
 	}
 
