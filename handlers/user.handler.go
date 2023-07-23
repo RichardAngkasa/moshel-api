@@ -7,6 +7,7 @@ import (
 	"log"
 	"moshel-api/lib"
 	"moshel-api/models"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -36,7 +37,7 @@ func Register(c *gin.Context) (string, error) {
 
 	getQuery := fmt.Sprintf("SELECT username FROM users WHERE username = ?")
 
-	stmt, err := db.Prepare("INSERT INTO users(username, password) values ($1, $2);")
+	stmt, err := db.Prepare("INSERT INTO users(username, password, created_at) values ($1, $2, $3);")
 	var resultUsername string
 
 	db.QueryRow(getQuery, UserInput.Username).Scan(&resultUsername)
@@ -45,7 +46,7 @@ func Register(c *gin.Context) (string, error) {
 		return "", errors.New("User already registered")
 	}
 
-	_, err = stmt.Exec(UserInput.Username, encryptedPass)
+	_, err = stmt.Exec(UserInput.Username, encryptedPass, time.Now())
 
 	if err != nil {
 		log.Println(err.Error())
