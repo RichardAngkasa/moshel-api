@@ -17,5 +17,5 @@ func main() {
 
 	r := router.CreateRoutes(db)
 
-	r.Run(":8080")
+	r.Run()
 }
