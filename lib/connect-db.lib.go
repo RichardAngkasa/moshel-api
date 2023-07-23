@@ -22,6 +22,7 @@ var (
 var connectStr = fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=disable", username, password, db, host, port)
 
 func ConnectDB() *sql.DB {
+	log.Println("DSN", connectStr)
 	db, err := sql.Open("postgres", connectStr)
 
 	if err != nil {
