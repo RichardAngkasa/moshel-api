@@ -62,13 +62,29 @@ func Register(c *gin.Context) (string, error) {
 }
 
 func Login(c *gin.Context) (string, error) {
-	// var userInput UserInput
+	db := c.MustGet("db").(*sql.DB)
+	var userInput models.UserDataInput
 
-	// if err := c.ShouldBind(&userInput); err != nil {
-	// 	return "", err
-	// }
-	// textPass, _ := lib.Decrypt(userInput.Password, secretKey)
+	if err := c.ShouldBind(&userInput); err != nil {
+		return "", err
+	}
 
-	// return textPass, nil
-	return "", nil
+	query := fmt.Sprintf("SELECT username, password FROM user where username = ?")
+	var username, password string
+
+	if err := db.QueryRow(query, userInput.Username).Scan(&username, &password); err != nil {
+		return "", errors.New("User not registered")
+	}
+
+	if err := lib.UnHashPassword(userInput.Password, password); err != nil {
+		return "", err
+	}
+
+	token, err := lib.GenerateToken(username, secretKey)
+
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
 }
