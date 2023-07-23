@@ -17,11 +17,11 @@ var (
 	db_uri = GetEnv("DB_URI")
 )
 
-var DSN = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", username, password, host, port, db)
+// var DSN = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", username, password, host, port, db)
+var connectStr = fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=disable", username, password, db, host, port)
 
 func ConnectDB() *sql.DB {
-	log.Println("db", DSN)
-	db, err := sql.Open("mysql", DSN)
+	db, err := sql.Open("mysql", connectStr)
 
 	if err != nil {
 		log.Fatal(err.Error())
