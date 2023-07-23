@@ -19,7 +19,6 @@ var (
 var DSN = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", username, password, host, port, db)
 
 func ConnectDB() *sql.DB {
-	fmt.Println(DSN)
 	db, err := sql.Open("mysql", DSN)
 
 	if err != nil {
