@@ -15,7 +15,7 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H { "message": token })
+	c.JSON(http.StatusCreated, gin.H { "message": "success", "token": token })
 }
 
 func GetUser(c *gin.Context) {
@@ -26,5 +26,5 @@ func GetUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H { "message": token })
+	c.JSON(http.StatusOK, gin.H { "message": "success", "token": token })
 }
