@@ -33,9 +33,9 @@ func Register(c *gin.Context) (string, error) {
 		return "", errMsg
 	}
 
-	getQuery := fmt.Sprintf("SELECT username FROM user WHERE username = ?")
+	getQuery := fmt.Sprintf("SELECT username FROM users WHERE username = ?")
 
-	query := fmt.Sprintf("INSERT INTO user(username, password) value('%s', '%s');", UserInput.Username, encryptedPass)
+	query := fmt.Sprintf("INSERT INTO users(username, password) value('%s', '%s');", UserInput.Username, encryptedPass)
 	var resultUsername string
 
 	db.QueryRow(getQuery, UserInput.Username).Scan(&resultUsername)
@@ -69,7 +69,7 @@ func Login(c *gin.Context) (string, error) {
 		return "", err
 	}
 
-	query := fmt.Sprintf("SELECT username, password FROM user where username = ?")
+	query := fmt.Sprintf("SELECT username, password FROM users where username = ?")
 	var username, password string
 
 	if err := db.QueryRow(query, userInput.Username).Scan(&username, &password); err != nil {
