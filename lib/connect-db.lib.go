@@ -2,7 +2,6 @@ package lib
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -14,12 +13,14 @@ var (
 	host  = GetEnv("DB_HOST")
 	port  = GetEnv("DB_PORT")
 	db = GetEnv("DB_DBNAME")
+	db_uri = GetEnv("DB_URI")
 )
 
-var DSN = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", username, password, host, port, db)
+// var DSN = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", username, password, host, port, db)
 
 func ConnectDB() *sql.DB {
-	db, err := sql.Open("mysql", DSN)
+	log.Println("db", db_uri)
+	db, err := sql.Open("mysql", db_uri)
 
 	if err != nil {
 		log.Fatal(err.Error())
