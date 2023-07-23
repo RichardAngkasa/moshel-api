@@ -46,7 +46,7 @@ func Register(c *gin.Context) (string, error) {
 		return "", errors.New("User already registered")
 	}
 
-	_, err = stmt.Exec(UserInput.Username, encryptedPass, time.Now())
+	_, err = stmt.Exec(UserInput.Username, encryptedPass, time.Now().Format("2006-01-02 15:04:05"))
 
 	if err != nil {
 		log.Println(err.Error())
