@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"log"
 
-	_ "github.com/go-sql-driver/mysql"
+	// _ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 )
 
 var (
@@ -21,7 +22,7 @@ var (
 var connectStr = fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=disable", username, password, db, host, port)
 
 func ConnectDB() *sql.DB {
-	db, err := sql.Open("mysql", connectStr)
+	db, err := sql.Open("postgres", connectStr)
 
 	if err != nil {
 		log.Fatal(err.Error())
