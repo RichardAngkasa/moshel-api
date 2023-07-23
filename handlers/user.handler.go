@@ -35,7 +35,7 @@ func Register(c *gin.Context) (string, error) {
 
 	getQuery := fmt.Sprintf("SELECT username FROM users WHERE username = ?")
 
-	query := fmt.Sprintf("INSERT INTO users(username, password) value('%s', '%s');", UserInput.Username, encryptedPass)
+	stmt, err := db.Prepare("INSERT INTO users(username, password) values ($1, $2);")
 	var resultUsername string
 
 	db.QueryRow(getQuery, UserInput.Username).Scan(&resultUsername)
@@ -44,9 +44,7 @@ func Register(c *gin.Context) (string, error) {
 		return "", errors.New("User already registered")
 	}
 
-	result , err := db.Query(query)
-
-	defer result.Close()
+	_, err = stmt.Exec(UserInput.Username, encryptedPass)
 
 	if err != nil {
 		return "", errors.New("Cannot insert data to db")
