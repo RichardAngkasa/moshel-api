@@ -1,11 +1,21 @@
 package main
 
 import (
+	"log"
+	"moshel-api/lib"
 	router "moshel-api/routers"
 )
 
 func main() {
-	r := router.CreateRoutes()
+	db := lib.ConnectDB()
+	defer db.Close()
+
+	err := db.Ping()
+	if err != nil {
+		log.Fatal("Error:", err.Error())
+	}
+
+	r := router.CreateRoutes(db)
 
 	r.Run(":8080")
 }

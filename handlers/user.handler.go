@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"moshel-api/lib"
@@ -9,16 +10,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type UserInput struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	ConfirmPassword string `json:"confirm_password"`
-}
-
 var secretKey = lib.GetEnv("SECRET_KEY")
+var costFactor = lib.GetEnv("COST_FACTOR")
 
 func Register(c *gin.Context) (string, error) {
-	var UserInput UserInput
+	db := c.MustGet("db").(*sql.DB)
+	var UserInput models.UserDataInput
 
 	if err := c.ShouldBind(&UserInput); err != nil {
 		return "", err
@@ -29,30 +26,49 @@ func Register(c *gin.Context) (string, error) {
 		return "", errMsg
 	}
 
-	encryptedPass, err := lib.EncryptPass(UserInput.Password, secretKey)
+	encryptedPass, err := lib.HashPassword(UserInput.Password, costFactor)
 
 	if UserInput.Password != UserInput.ConfirmPassword {
 		errMsg := errors.New(err.Error())
 		return "", errMsg
 	}
 
-	NewUser := models.UserData{
-		Username: UserInput.Username,
-		Password: encryptedPass,
+	getQuery := fmt.Sprintf("SELECT username FROM user WHERE username = ?")
+
+	query := fmt.Sprintf("INSERT INTO user(username, password) value('%s', '%s');", UserInput.Username, encryptedPass)
+	var resultUsername string
+
+	db.QueryRow(getQuery, UserInput.Username).Scan(&resultUsername)
+
+	if resultUsername == UserInput.Username {
+		return "", errors.New("User already registered")
 	}
 
-	fmt.Println(NewUser)
+	result , err := db.Query(query)
 
-	return "", nil
+	defer result.Close()
+
+	if err != nil {
+		return "", errors.New("Cannot insert data to db")
+	}
+
+	token, err := lib.GenerateToken(UserInput.Username, secretKey)
+
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
 }
 
 func Login(c *gin.Context) (string, error) {
-	var userInput UserInput
+	// var userInput UserInput
 
-	if err := c.ShouldBind(&userInput); err != nil {
-		return "", err
-	}
-	textPass, _ := lib.Decrypt(userInput.Password, secretKey)
+	// if err := c.ShouldBind(&userInput); err != nil {
+	// 	return "", err
+	// }
+	// textPass, _ := lib.Decrypt(userInput.Password, secretKey)
 
-	return textPass, nil
+	// return textPass, nil
+	return "", nil
 }
