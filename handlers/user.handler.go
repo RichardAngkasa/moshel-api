@@ -7,7 +7,6 @@ import (
 	"log"
 	"moshel-api/lib"
 	"moshel-api/models"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -35,22 +34,13 @@ func Register(c *gin.Context) (string, error) {
 		return "", errMsg
 	}
 
-	getQuery := fmt.Sprintf("SELECT username FROM users WHERE username = ?")
+	query := fmt.Sprintf("INSERT INTO users(username, password, created_at) values('%v', '%v', NOW());", UserInput.Username, encryptedPass)
 
-	stmt, err := db.Prepare("INSERT INTO users(username, password, created_at) values ($1, $2, $3);")
-	var resultUsername string
-
-	db.QueryRow(getQuery, UserInput.Username).Scan(&resultUsername)
-
-	if resultUsername == UserInput.Username {
-		return "", errors.New("User already registered")
-	}
-
-	_, err = stmt.Exec(UserInput.Username, encryptedPass, time.Now().Format("2006-01-02 15:04:05"))
+	_, err = db.ExecContext(c, query)
 
 	if err != nil {
 		log.Println(err.Error())
-		return "", errors.New("Cannot insert data to db")
+		return "", errors.New("User already registered")
 	}
 
 	token, err := lib.GenerateToken(UserInput.Username, secretKey)
@@ -70,11 +60,16 @@ func Login(c *gin.Context) (string, error) {
 		return "", err
 	}
 
-	query := fmt.Sprintf("SELECT username, password FROM users where username = ?")
+	query := fmt.Sprintf("SELECT username, password FROM users where username = '%v'", userInput.Username)
 	var username, password string
 
-	if err := db.QueryRow(query, userInput.Username).Scan(&username, &password); err != nil {
-		return "", errors.New("User not registered")
+	err := db.QueryRowContext(c, query).Scan(&username, &password)
+	log.Println("username", username)
+	log.Println("pass", password)
+	if err != nil {
+		log.Println("error", err.Error())
+		msg := fmt.Sprintf("Cannot find user with username '%v'", userInput.Username)
+		return "", errors.New(msg)
 	}
 
 	if err := lib.UnHashPassword(userInput.Password, password); err != nil {
